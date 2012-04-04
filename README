@@ -1,0 +1,7 @@
+this is the start of a command line artificial intelligence script.
+
+the first steps will be to allow triton to replicate to other machines and take with it your settings and information
+
+the second steps will be to make triton aware of where it is installed for a user and allow it to update all nodes at once
+
+the next steps will be to allow customization via .tritonrc files as well as addon modules so that triton has some AI
