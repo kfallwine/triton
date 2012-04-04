@@ -1,0 +1,81 @@
+#!/bin/bash
+#
+#=== this is the triton command line AI
+#=== created by: 
+#===			Kenneth Allwine II	-	kfallwine@gmail.com
+#===			Anthony Neumayer	-	anuemayer@gmail.com
+#===			Joseph Hoffmann		-	jhoff3ca@gmail.com
+#
+#
+#todo:		add a .triton directory to store config files and such in when a triton config is called
+#			change the .ssh persist setting to allow for all of the ssh magic of install to work
+#
+
+#===config
+config() {
+	echo "this is config"
+} #end of config 
+
+#===help
+help() {
+	echo "this is the help"
+} #end of help
+
+#===usage
+usage() {
+	echo -e "*triton usage*"
+	echo -e " HELP"
+	echo -e "  help or h"
+	echo -e " INSTALL"
+	echo -e "  install or i 'hostname or ip'"
+} #end of usag
+
+#===read the .tritonrc file
+readRC(){
+	while read vars 
+		do 
+			echo $vars | awk '{ print $1 $2 }' 
+		done<.tritonrc
+} # end of reading .tritonrc file
+
+
+#===handle the action from the user input
+#action=$( printf "%s\n" "$ACTION" | tr 'A-Z' 'a-z' )
+action=$1
+value=$2
+
+#===case statement to handle the input
+case $action in
+
+#===config
+	"config" | "c")
+		config	
+	;;
+
+#===display the help
+	"help" | "h")
+		help
+	;;
+
+#===install a new node
+	"install" | "i")
+		echo -n "installing on" $value
+		#copy over RSA public key
+		scp ~/.ssh/id_rsa.pub $value:~
+		#cat the RSA public key to the authorized_keys file in the ~/.ssh/ folder
+		ssh $value 'mkdir -p ~/.ssh; touch ~/.ssh/authorized_keys; cat ~/id_rsa.pub >> ~/.ssh/authorized_keys; rm ~/id_rsa.pub'
+		
+		#scp over the triton script
+		scp triton $value:~
+		#add a value to the host file so we know where triton is installed
+		
+	;;
+
+#===catch all
+
+	*)
+		usage
+	;;
+
+esac # done with the case statement
+
