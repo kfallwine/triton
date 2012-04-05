@@ -69,6 +69,8 @@ case $action in
 		scp triton $value:~
 		#add a value to the host file so we know where triton is installed
 		
+		#add reading of a file list so that all of the dot files can be transfered over
+
 	;;
 
 #===catch all
