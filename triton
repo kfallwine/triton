@@ -8,7 +8,7 @@
 #===			Joseph Hoffmann		-	
 #
 #
-#todo:		add a .triton directory to store config files and such in when a triton config is called
+#todo:		
 #			change the .ssh persist setting to allow for all of the ssh magic of install to work
 #			add the ability to create a host name pairing so that installed nodes can have nicknames 
 #			add the ability to ssh and connect to a node with a name
@@ -26,16 +26,21 @@ help() {
 
 #===install
 install() {
-		#value = $1
 		
-	#copy over RSA public key
+				#copy over RSA public key
 				scp ~/.ssh/id_rsa.pub $1:~
 				#cat the RSA public key to the authorized_keys file in the ~/.ssh/ folder
 				ssh $1 'mkdir -p ~/.ssh; touch ~/.ssh/authorized_keys; cat ~/id_rsa.pub >> ~/.ssh/authorized_keys; rm ~/id_rsa.pub; mkdir -p ~/.triton'
 				#scp over the triton script
 				scp triton $1:~
 
-				#now transfer over the dot files from the filelist
+				#now transfer over the dot files from the filelist by calling upgrade
+				upgrade $1
+
+} #end of install
+
+#===upgrade
+upgrade(){
 				while read vars 
 					do 
 						echo "transfering " $vars 
@@ -45,7 +50,8 @@ install() {
 				#add a value to nodelist
 				echo "${1}" >> ~/.triton/nodelist	
 
-}
+} #end of upgrade function
+
 #===usage
 usage() {
 	echo -e "*triton usage*"
@@ -100,6 +106,7 @@ case $action in
 	;;
 
 #===install a new node using a ssh key
+#change this function to match the install
 	"key-install" | "ki")
 		echo -n "installing on" $value
 		#copy over RSA public key using a pem key 
