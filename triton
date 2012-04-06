@@ -3,12 +3,15 @@
 #=== this is the triton command line AI
 #=== created by: 
 #===			Kenneth Allwine II	-	
-#===			Anthony Neumayer	-	
+#===			Anthony Neumayer	-
+#===			David Cornell		-
 #===			Joseph Hoffmann		-	
 #
 #
 #todo:		add a .triton directory to store config files and such in when a triton config is called
 #			change the .ssh persist setting to allow for all of the ssh magic of install to work
+#			add the ability to create a host name pairing so that installed nodes can have nicknames 
+#			add the ability to ssh and connect to a node with a name
 #
 
 #===config
@@ -21,6 +24,28 @@ help() {
 	echo "this is the help"
 } #end of help
 
+#===install
+install() {
+		#value = $1
+		
+	#copy over RSA public key
+				scp ~/.ssh/id_rsa.pub $1:~
+				#cat the RSA public key to the authorized_keys file in the ~/.ssh/ folder
+				ssh $1 'mkdir -p ~/.ssh; touch ~/.ssh/authorized_keys; cat ~/id_rsa.pub >> ~/.ssh/authorized_keys; rm ~/id_rsa.pub; mkdir -p ~/.triton'
+				#scp over the triton script
+				scp triton $1:~
+
+				#now transfer over the dot files from the filelist
+				while read vars 
+					do 
+						echo "transfering " $vars 
+						CMD="scp ${vars} ${1}:${vars}"
+						eval $CMD	
+					done<~/.triton/filelist
+				#add a value to nodelist
+				echo "${1}" >> ~/.triton/nodelist	
+
+}
 #===usage
 usage() {
 	echo -e "*triton usage*"
@@ -28,6 +53,9 @@ usage() {
 	echo -e "  help or h"
 	echo -e " INSTALL"
 	echo -e "  install or i 'hostname or ip'"
+	echo -e " INSTALL WITH KEY"
+	echo -e "  key-install or ki 'hostname or ip' 'key file'"
+
 } #end of usag
 
 #===read the .tritonrc file
@@ -35,7 +63,7 @@ readRC(){
 	while read vars 
 		do 
 			echo $vars | awk '{ print $1 $2 }' 
-		done<.tritonrc
+		done<.triton/tritonrc
 } # end of reading .tritonrc file
 
 
@@ -59,17 +87,51 @@ case $action in
 
 #===install a new node
 	"install" | "i")
+		#add a value to the nodelist so we know where triton is installed - check to see if it already exists
+		if grep -Fxq "$value" ~/.triton/nodelist
+			then
+				echo "already installed, do an upgrade instead"
+			else
+				echo -n "installing on" $value
+				install $value
+					
+		fi # done with the else we havent installed here yet
+
+	;;
+
+#===install a new node using a ssh key
+	"key-install" | "ki")
 		echo -n "installing on" $value
-		#copy over RSA public key
-		scp ~/.ssh/id_rsa.pub $value:~
-		#cat the RSA public key to the authorized_keys file in the ~/.ssh/ folder
-		ssh $value 'mkdir -p ~/.ssh; touch ~/.ssh/authorized_keys; cat ~/id_rsa.pub >> ~/.ssh/authorized_keys; rm ~/id_rsa.pub'
-		
-		#scp over the triton script
-		scp triton $value:~
-		#add a value to the host file so we know where triton is installed
-		
-		#add reading of a file list so that all of the dot files can be transfered over
+		#copy over RSA public key using a pem key 
+		scp -i $3 ~/.ssh/id_rsa.pub $value:~
+		#cat the RSA public key to the authorized_keys file in the ~/.ssh/ folder also make a .triton file for config files
+		ssh -i $3 $value 'mkdir -p ~/.ssh; touch ~/.ssh/authorized_keys; cat ~/id_rsa.pub >> ~/.ssh/authorized_keys; rm ~/id_rsa.pub; mkdir -p ~/.triton'
+		#now transfer over the dot files from the filelist
+		while read vars 
+			do 
+				echo "transfering " $vars 
+				CMD="scp ${vars} ${value}:${vars}"
+				eval $CMD	
+			done<.triton/filelist
+
+	;;
+
+#===testing file transfer
+	"test_file")
+		echo "*this is for testing reading the file list*"
+		while read vars 
+			do 
+				echo "transfering " $vars 
+				CMD="scp ${vars} ${value}:${vars}"
+				eval $CMD	
+			done<.triton/filelist
+
+	;;
+
+#===testing adding nodes
+	"test_node")
+		echo "*this is for testing adding nodes*"
+		cat '`$3` `$4`' >> ~/.triton/nodelist
 
 	;;
 
