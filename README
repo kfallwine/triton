@@ -1,7 +1,15 @@
-this is the start of a command line artificial intelligence script.
+triton provides system admins and developers the ability to conveniently and easily set up new nodes with all
+the necessary dot files, configuration files, and rsa keys necessary for an account.
 
-the first steps will be to allow triton to replicate to other machines and take with it your settings and information
+triton will be compatible with unix based operating systems and allow for easy transfer of necessary shell account
+files to a new machine.
 
-the second steps will be to make triton aware of where it is installed for a user and allow it to update all nodes at once
+Currently triton allows a user to install rsa keys as well as files located in the .triton/filelist to a new machine easily.
+You should change your .ssh/config file to add the following line to make triton's life easier during installs: ControlPersist 1h
 
-the next steps will be to allow customization via .tritonrc files as well as addon modules so that triton has some AI
+The goal of triton is to allow for a single upgrade command to be issued to update your configuration files everywhere.  In addition
+triton is transfered when you install and upgrade so triton can be a one stop shop for all your command line needs.
+
+In the future triton will support addon modules given it the ability to be expanded and used for many purposes!
+
+Feel free to fork and modify to provide triton with more capabilities.  Let me know so we can merge them back into master.
