@@ -26,6 +26,8 @@ help() {
 
 #===install
 install() {
+				#add a value to nodelist
+				echo "${1}" >> ~/.triton/nodelist	
 		
 				#copy over RSA public key
 				scp ~/.ssh/id_rsa.pub $1:~
@@ -47,8 +49,6 @@ upgrade(){
 						CMD="scp ${vars} ${1}:${vars}"
 						eval $CMD	
 					done<~/.triton/filelist
-				#add a value to nodelist
-				echo "${1}" >> ~/.triton/nodelist	
 
 } #end of upgrade function
 
@@ -114,12 +114,6 @@ case $action in
 		#cat the RSA public key to the authorized_keys file in the ~/.ssh/ folder also make a .triton file for config files
 		ssh -i $3 $value 'mkdir -p ~/.ssh; touch ~/.ssh/authorized_keys; cat ~/id_rsa.pub >> ~/.ssh/authorized_keys; rm ~/id_rsa.pub; mkdir -p ~/.triton'
 		#now transfer over the dot files from the filelist
-		while read vars 
-			do 
-				echo "transfering " $vars 
-				CMD="scp ${vars} ${value}:${vars}"
-				eval $CMD	
-			done<.triton/filelist
 
 	;;
 
@@ -140,6 +134,21 @@ case $action in
 		echo "*this is for testing adding nodes*"
 		cat '`$3` `$4`' >> ~/.triton/nodelist
 
+	;;
+
+#===upgrade
+	"upgrade" | "u")
+		if [ -z "$value" ] 	
+		then
+			while read node 
+				do 
+					echo "updating " $node
+					upgrade $node
+			done<.triton/nodelist
+		else
+			echo "updating " $value
+			upgrade $value
+		fi
 	;;
 
 #===catch all
