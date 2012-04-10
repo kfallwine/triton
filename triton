@@ -12,6 +12,7 @@
 #			change the .ssh persist setting to allow for all of the ssh magic of install to work
 #			add the ability to create a host name pairing so that installed nodes can have nicknames 
 #			add the ability to ssh and connect to a node with a name
+#			check to see if nodelist and filelist exist, create them if they dont
 #
 
 #===config
