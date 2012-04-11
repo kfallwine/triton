@@ -33,7 +33,7 @@ install() {
 				#copy over RSA public key
 				scp ~/.ssh/id_rsa.pub $1:~
 				#cat the RSA public key to the authorized_keys file in the ~/.ssh/ folder
-				ssh $1 'mkdir -p ~/.ssh; touch ~/.ssh/authorized_keys; cat ~/id_rsa.pub >> ~/.ssh/authorized_keys; rm ~/id_rsa.pub; mkdir -p ~/.triton'
+				ssh $1 'mkdir -p ~/.ssh; touch ~/.ssh/authorized_keys; cat ~/id_rsa.pub >> ~/.ssh/authorized_keys; rm ~/id_rsa.pub; mkdir -p ~/.triton; mkdir -p ~/.vim/colors'
 				#scp over the triton script
 				scp triton $1:~
 
